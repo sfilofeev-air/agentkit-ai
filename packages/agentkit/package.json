@@ -1,5 +1,5 @@
 {
-  "name": "agentkit-ai",
+  "name": "agentkit-framework",
   "version": "0.1.0",
   "description": "The Express.js of AI Agents — simple, production-ready, observable",
   "type": "module",
