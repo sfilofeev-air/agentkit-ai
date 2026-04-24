@@ -8,6 +8,8 @@ import type {
   ToolResult,
 } from "./types.js";
 import { executeTool, findTool } from "./tool.js";
+import { withRetry } from "./retry.js";
+import { RateLimiter } from "./rate-limit.js";
 
 const DEFAULT_MAX_ITERATIONS = 10;
 
@@ -16,12 +18,17 @@ export class Agent {
     Pick<AgentConfig, "name" | "provider" | "model" | "maxIterations">
   > &
     AgentConfig;
+  private rateLimiter?: RateLimiter;
 
   constructor(config: AgentConfig) {
     this.config = {
       ...config,
       maxIterations: config.maxIterations ?? DEFAULT_MAX_ITERATIONS,
     };
+
+    if (config.rateLimit !== false && config.rateLimit) {
+      this.rateLimiter = new RateLimiter(config.rateLimit);
+    }
   }
 
   get name(): string {
@@ -71,13 +78,23 @@ export class Agent {
           },
         });
 
-        const response = await this.config.provider.complete({
-          model: this.config.model,
-          messages,
-          tools: this.config.tools,
-          temperature: this.config.temperature,
-          maxTokens: this.config.maxTokens,
-        });
+        if (this.rateLimiter) {
+          await this.rateLimiter.acquire();
+        }
+
+        const completionFn = () =>
+          this.config.provider.complete({
+            model: this.config.model,
+            messages,
+            tools: this.config.tools,
+            temperature: this.config.temperature,
+            maxTokens: this.config.maxTokens,
+          });
+
+        const response =
+          this.config.retry === false
+            ? await completionFn()
+            : await withRetry(completionFn, this.config.retry);
 
         totalUsage.inputTokens += response.usage.inputTokens;
         totalUsage.outputTokens += response.usage.outputTokens;

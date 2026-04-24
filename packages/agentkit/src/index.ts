@@ -1,6 +1,8 @@
 // Core
 export { Agent } from "./agent.js";
 export { defineTool } from "./tool.js";
+export { withRetry } from "./retry.js";
+export { RateLimiter } from "./rate-limit.js";
 
 // Providers
 export { AnthropicProvider } from "./providers/anthropic.js";
@@ -17,6 +19,8 @@ export type {
   CompletionChunk,
   Message,
   Provider,
+  RateLimitConfig,
+  RetryConfig,
   Role,
   TokenUsage,
   ToolCall,
@@ -24,3 +28,5 @@ export type {
   ToolParameterSchema,
   ToolResult,
 } from "./types.js";
+export type { RetryOptions } from "./retry.js";
+export type { RateLimitOptions } from "./rate-limit.js";

@@ -86,6 +86,26 @@ export interface Provider {
 
 // === Agent ===
 
+/** Retry configuration */
+export interface RetryConfig {
+  /** Max number of retries (default: 3) */
+  maxRetries?: number;
+  /** Initial delay in ms (default: 1000) */
+  initialDelay?: number;
+  /** Backoff multiplier (default: 2) */
+  backoffMultiplier?: number;
+  /** Max delay in ms (default: 30000) */
+  maxDelay?: number;
+}
+
+/** Rate limit configuration */
+export interface RateLimitConfig {
+  /** Max requests per window (default: 60) */
+  maxRequests?: number;
+  /** Window size in ms (default: 60000) */
+  windowMs?: number;
+}
+
 /** Agent configuration */
 export interface AgentConfig {
   name: string;
@@ -97,6 +117,8 @@ export interface AgentConfig {
   temperature?: number;
   maxTokens?: number;
   maxIterations?: number;
+  retry?: RetryConfig | false;
+  rateLimit?: RateLimitConfig | false;
   onEvent?: (event: AgentEvent) => void;
 }
 
