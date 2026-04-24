@@ -1,4 +1,4 @@
-import { Agent, AnthropicProvider, defineTool } from "agentkit-ai";
+import { Agent, AnthropicProvider, defineTool } from "agentkit-framework";
 
 // 1. Define tools
 const weatherTool = defineTool({
